@@ -1,0 +1,59 @@
+package asterisk;
+
+import java.util.List;
+import java.util.ArrayList;
+
+public class Stack {
+
+    private List<Box> stack;
+
+    public Stack() {
+         stack = new ArrayList<Box>();
+    }
+    
+    public List<Box> getStack() {
+        return stack;
+    }
+
+    public void push(Box box) {
+        getStack().add(0, box);
+    }
+
+    public Box pop() {
+        if(!stack.isEmpty()){
+            Box box = getStack().get(0);
+            getStack().remove(0);
+            return box;
+        } else {
+            return null;
+        }
+    }
+
+    public Box peek() {
+        if(!stack.isEmpty()) {
+            return getStack().get(0);
+        } else {
+            return null;// Or any invalid value
+        }
+    }
+
+    public Box peek(int i) {
+        if(!stack.isEmpty()) {
+            return getStack().get(i);
+        } else {
+            return null;// Or any invalid value
+        }
+    }
+
+    public boolean isEmpty() {
+        return getStack().isEmpty();
+    }
+
+    public int size(){
+        return getStack().size();
+    }
+    
+    public boolean equals(Stack stack){
+        return stack.getStack().equals(this.stack);
+    }
+}
