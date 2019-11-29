@@ -14,16 +14,25 @@ import java.util.List;
  */
 public class Util {
     
-    public static boolean isGoalStateNode(StateNode node){
+    public static void heuristicOrder(List<GraphNode> list) throws Exception
+    {
+        throw new Exception("heuristicOrder: Not implemented yet.");
+    }
+    
+    public static boolean isGoalState(State node){
         return node.getProductionList().isEmpty();
     }
     
-    public static List<StateNode> expand(
-            StateNode currentNode,
-            boolean checkLoops)
+    public static List<State> expand(State currentNode)
+    {
+        return expand(currentNode, true);
+    }
+    
+    private static List<State> expand(State currentNode,
+                                         boolean checkLoops)
     {
         
-        List<StateNode> successors = new ArrayList<>();
+        List<State> successors = new ArrayList<>();
         
         List<Box> newProductionList =
                 new ArrayList<>(currentNode.getProductionList());
@@ -34,15 +43,15 @@ public class Util {
                     new StorageHouse(currentNode.getStorageHouse());
             newStorageHouse.addBox(currentBox, i);
             
-            StateNode nextNode = new StateNode(
+            State nextNode = new State(
                             newProductionList,
                             newStorageHouse
                     );
             
             boolean shouldAdd = true;
             if (checkLoops){
-                List<StateNode> nextNodeSuccessors = expand(nextNode, false);
-                for (StateNode n : nextNodeSuccessors){
+                List<State> nextNodeSuccessors = expand(nextNode, false);
+                for (State n : nextNodeSuccessors){
                     if (n.equals(currentNode))
                         shouldAdd = false;
                         break;

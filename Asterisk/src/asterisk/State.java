@@ -12,12 +12,17 @@ import java.util.ArrayList;
  *
  * @author i0910465
  */
-public class StateNode {
+public class State {
     
     private List<Box> productionList;
     private StorageHouse storageHouse;
 
-    public StateNode(List<Box> productionList, StorageHouse storageHouse) {
+    public State(){
+        this.productionList = new ArrayList<>();
+        this.storageHouse = new StorageHouse();
+    }
+    
+    public State(List<Box> productionList, StorageHouse storageHouse) {
         this.productionList = productionList;
         this.storageHouse = storageHouse;
     }
