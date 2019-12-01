@@ -69,13 +69,13 @@ public class Util {
         // Copy the old production list into the new one we are going to test
         try {
             newProductionList.addAll(currentNode.getProductionList());
-            Util.printProductionList(currentNode.getProductionList(), "NEW_PRODUCTION_LIST");
-            System.out.println("Remove(0) from New Production List returns = " + newProductionList.remove(0).getId());
+            Util.printProductionList(currentNode.getProductionList(), "NEW_PRODUCTION_LIST", recursivityLevel);
         } catch (Exception ex) {
             Logger.getLogger(Asterisk.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         Box currentBox = newProductionList.remove(0);
+        System.out.println("Remove(0) from New Production List returns = " + currentBox.getId());
         
         // ITerate over stacks
         for (int i = 0; i < 5; ++i){
@@ -104,9 +104,11 @@ public class Util {
             if (checkLoops){
                 List<State> nextNodeSuccessors = expand(nextNode, recursivityLevel+1, false);
                 for (State n : nextNodeSuccessors){
-                    if (n.equals(currentNode))
+                    if (n.getStorageHouse().equals(currentNode.getStorageHouse())){
+                        System.out.println("FOUND LOOP. BREAKING ... ");
                         shouldAdd = false;
                         break;
+                    }
                 }
             }
             
@@ -149,7 +151,7 @@ public class Util {
             i++;
             
             // Print productionList
-            Util.printProductionList(n.getData().getProductionList(), "PRODUCTION_LIST");
+            Util.printProductionList(n.getData().getProductionList(), "PRODUCTION_LIST", 0);
             
             // Print status of the storageHouse
             if (listName.equals("OPEN"))
@@ -168,9 +170,9 @@ public class Util {
         System.out.print("] \n");
     }
     
-    private static void printProductionList(List<Box> productionList, String productionListName){
+    private static void printProductionList(List<Box> productionList, String productionListName, int level){
         int j = 1;
-        System.out.print("\n\n" + productionListName + ": [\n");
+        System.out.print("\n\n" + "( LEVEL " + level +" ) " + productionListName + ": [\n");
         for (Box b : productionList){
             System.out.printf("( ID: " + b.getId() + ", Departure: " + b.getDepartureDate() + " ), ");
             j++;
@@ -180,6 +182,15 @@ public class Util {
             }
         }
         System.out.print("\n]\n\n");
+    }
+
+    public static boolean invalidStack(Stack stack, Box newBoxToAdd) {
+        Box stackUpperBox = stack.getStack().get(0);
+        
+        if (stackUpperBox.getDepartureDate() >= newBoxToAdd.getDepartureDate())
+            return false;
+        else
+            return true;
     }
     
 }

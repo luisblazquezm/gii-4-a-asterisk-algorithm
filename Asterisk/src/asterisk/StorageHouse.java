@@ -41,7 +41,10 @@ public class StorageHouse implements Cloneable{
 
     public boolean addBox(Box box, int position) {
         if (position >= 0 && position < NUMBER_OF_STACKS) {
-            if (this.stacks[position].size() < STACK_SIZE) {
+            if (this.stacks[position].size() == 0){
+                this.stacks[position].push(box);
+                return true;
+            } else if (this.stacks[position].size() < STACK_SIZE && !Util.invalidStack(this.stacks[position], box)) { ////////////////////////////////////////////<<<< CHANGED THIS
                 this.stacks[position].push(box);
                 return true;
             }
@@ -50,10 +53,15 @@ public class StorageHouse implements Cloneable{
     }
 
     public boolean equals(StorageHouse storageHouse){
-        if (this.stacks.length != storageHouse.getStacks().length) return false;
-        for (int i = 0; i < this.stacks.length; ++i){
-            if (!this.stacks[i].equals(storageHouse.getStacks()[i]))
+        //if (this.stacks.length != storageHouse.getStacks().length) return false;
+        //System.out.println("JEJE: " + this.stacks.length);
+        for (int i = 0; i < this.stacks.length; i++){
+            //System.out.println(String.format("(STACK %d) this.stacks.length = (%d), storageHouse.getStacks().length = (%d)", i, this.stacks[i].size(), storageHouse.getStacks()[i].size())); ///// DEBUG
+            if (this.stacks[i].size() != storageHouse.getStacks()[i].size()) return false;
+            if (!this.stacks[i].equals(storageHouse.getStacks()[i])){
+                //System.out.println("Not equals stack. Returns False"); // Debug
                 return false;
+            }
         }
         return true;
     }

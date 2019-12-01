@@ -98,7 +98,7 @@ public class Asterisk {
             System.out.println("====================================================");
             System.out.println("-----------------     OPEN    ----------------- ");  //DEBUG
             System.out.println("====================================================");
-            Util.printLists(open, "OPEN"); // DEBUG
+            //Util.printLists(open, "OPEN"); // DEBUG
             
             // 3.1
             // If open is empty, FAILURE
@@ -115,7 +115,7 @@ public class Asterisk {
             System.out.println("\n\n====================================================");
             System.out.println("-----------------     CLOSED    ----------------- ");  //DEBUG
             System.out.println("====================================================");
-            Util.printLists(closed, "CLOSED"); // DEBUG
+            //Util.printLists(closed, "CLOSED"); // DEBUG
             System.out.println("\n\n=======================================================================");
             System.out.println("-----------------     ACTUAL STATE OF STORAGEHOUSE    ----------------- ");  //DEBUG
             System.out.println("=======================================================================");
