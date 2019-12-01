@@ -1,6 +1,6 @@
 package asterisk;
 
-public class Box {
+public class Box implements Cloneable{
     private int id;
     private int arrivalDate;
     private int departureDate;
@@ -12,15 +12,15 @@ public class Box {
     }
 
     public int getId() {
-        return id;
+        return this.id;
     }
 
     public int getArrivalDate() {
-        return arrivalDate;
+        return this.arrivalDate;
     }
 
     public int getDepartureDate() {
-        return departureDate;
+        return this.departureDate;
     }
     
     public boolean equals(Box b2) {
@@ -29,4 +29,9 @@ public class Box {
                 && this.getDepartureDate() == b2.getDepartureDate()
                 );
     }
+    
+    public Box clone() throws CloneNotSupportedException 
+    { 
+        return new Box(this.id, this.arrivalDate, this.departureDate); 
+    } 
 }

@@ -3,16 +3,20 @@ package asterisk;
 import java.util.List;
 import java.util.ArrayList;
 
-public class Stack {
+public class Stack implements Cloneable{
 
     private List<Box> stack;
 
     public Stack() {
-         stack = new ArrayList<Box>();
+        this.stack = new ArrayList<Box>();
+    }
+    
+    public Stack(List<Box> newStack) {
+        this.stack = newStack;
     }
     
     public List<Box> getStack() {
-        return stack;
+        return this.stack;
     }
 
     public void push(Box box) {
@@ -56,4 +60,15 @@ public class Stack {
     public boolean equals(Stack stack){
         return stack.getStack().equals(this.stack);
     }
+    
+    public Stack clone() throws CloneNotSupportedException 
+    { 
+        int i;
+        List<Box> newStack = new ArrayList<Box>();
+        
+        for (Box b : this.stack)
+            newStack.add(b.clone());
+            
+        return new Stack(newStack); 
+    } 
 }

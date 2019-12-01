@@ -9,9 +9,11 @@ package asterisk;
  *
  * @author lgt12
  */
-public class GraphNode<T> {
+public class GraphNode<T> implements Comparable<GraphNode> {
 
     private T data;
+    private int nodeID;
+    private int evalFunction;
 
     public GraphNode() {}
 
@@ -25,5 +27,26 @@ public class GraphNode<T> {
 
     public void setData(T data) {
         this.data = data;
+    }
+
+    public int getNodeID() {
+        return this.nodeID;
+    }
+
+    public void setNodeID(int oldNodeID) {
+        this.nodeID = oldNodeID + 1;
+    }
+    
+    public int getEvalFunction() {
+        return this.evalFunction;
+    }
+
+    public void setEvalFunction(int evalFunction) {
+        this.evalFunction = evalFunction;
+    }
+    
+    @Override
+    public int compareTo(GraphNode n) {
+        return this.evalFunction - n.evalFunction;
     }
 }

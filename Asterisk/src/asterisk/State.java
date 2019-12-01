@@ -12,7 +12,7 @@ import java.util.ArrayList;
  *
  * @author i0910465
  */
-public class State {
+public class State{
     
     private List<Box> productionList;
     private StorageHouse storageHouse;
@@ -54,5 +54,5 @@ public class State {
     public void setStorageHouse(StorageHouse storageHouse) {
         this.storageHouse = storageHouse;
     }
-    
+
 }
