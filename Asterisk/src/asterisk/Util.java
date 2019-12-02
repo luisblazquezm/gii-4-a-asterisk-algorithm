@@ -34,6 +34,7 @@ public class Util {
                     g += b.getDepartureDate();
                 }
             }
+            System.out.println("h: " + h + " - g: " + g);
             f = - (h + g);
             n.setEvalFunction(f);
             
@@ -103,13 +104,15 @@ public class Util {
             
             if (checkLoops){
                 List<State> nextNodeSuccessors = expand(nextNode, recursivityLevel+1, false);
+                /*
                 for (State n : nextNodeSuccessors){
-                    if (n.getStorageHouse().equals(currentNode.getStorageHouse())){
+                    if (Util.compareNodes(n, currentNode)){
                         System.out.println("FOUND LOOP. BREAKING ... ");
                         shouldAdd = false;
                         break;
                     }
                 }
+                */
             }
             
             if (shouldAdd){
@@ -191,6 +194,10 @@ public class Util {
             return false;
         else
             return true;
+    }
+    
+    public static boolean compareNodes(State h1, State h2) {
+        return h1.getStorageHouse().equals(h2.getStorageHouse());
     }
     
 }

@@ -99,6 +99,7 @@ public class Asterisk {
             System.out.println("-----------------     OPEN    ----------------- ");  //DEBUG
             System.out.println("====================================================");
             //Util.printLists(open, "OPEN"); // DEBUG
+
             
             // 3.1
             // If open is empty, FAILURE
@@ -112,10 +113,20 @@ public class Asterisk {
             GraphNode<State> nextNode = open.remove(0);
             closed.add(0, nextNode);
             
+            //DEBUG
+            for(GraphNode<State> n : open){
+                System.out.print(n.getNodeID() + ", ");
+            }
+            
             System.out.println("\n\n====================================================");
             System.out.println("-----------------     CLOSED    ----------------- ");  //DEBUG
             System.out.println("====================================================");
             //Util.printLists(closed, "CLOSED"); // DEBUG
+            //DEBUG
+            for(GraphNode<State> n : closed){
+                System.out.print(n.getNodeID() + ", ");
+            }
+            
             System.out.println("\n\n=======================================================================");
             System.out.println("-----------------     ACTUAL STATE OF STORAGEHOUSE    ----------------- ");  //DEBUG
             System.out.println("=======================================================================");
@@ -146,16 +157,20 @@ public class Asterisk {
                 // Check if contained in open
                 // Loops needed because cannot compare either State to
                 // GraphNode nor pointers one to each other
-                for (GraphNode n : open){
-                    if (n.getData().equals(s)){
+                System.out.println("\n\nLet´s see if succesor is in OPEN"); //DEBUG
+                for (GraphNode<State> n : open){
+                    if (Util.compareNodes(n.getData(), s)){
+                        System.out.println("IT IS IN OPEN\n"); //DEBUG
                         alreadyContains = "OPEN";
                         break;
                     }
                 }
                 
+                System.out.println("\n\nLet´s see if succesor is in CLOSED\n"); //DEBUG
                 if (alreadyContains.equals("NONE")){
-                    for (GraphNode n : closed){
-                        if (n.getData().equals(s)){
+                    for (GraphNode<State> n : closed){
+                        if (Util.compareNodes(n.getData(), s)){
+                            System.out.println("IT IS IN CLOSED\n"); //DEBUG
                             alreadyContains = "CLOSED";
                             break;
                         }
@@ -177,10 +192,79 @@ public class Asterisk {
                     // 1 - Decide if pointers should be modified (-> nextNode)
                     // 2 - Decided if pointers of children of elements
                     //     contained in closed should be modified as well
+                    
+                    int g1 = 0;
+                    int h1 = 0;
+                    int g2 = 0;
+                    int h2 = 0;
+                    int f = 0;
+                    
+                    System.out.println("TREAT SUCCESOR in " + alreadyContains); //DEBUG
                     if (alreadyContains.equals("CLOSED")){
                         // Do point 2
-                        System.out.println("Modify pointers");
-                    }
+                        
+                        // Get new father. Node antecesor of s in closed list
+                        System.out.println("OEOE: " + closed.indexOf(successorNode) + 1);
+                        GraphNode<State> antecesor = closed.get(1);
+                        
+                        for(Stack stack : antecesor.getData().getStorageHouse().getStacks()){
+                            h1 += StorageHouse.STACK_SIZE - stack.size();
+                            for (Box b : stack.getStack()){
+                                g1 += b.getDepartureDate();
+                            }
+                        }
+                        
+                        for(Stack stack : nextNode.getData().getStorageHouse().getStacks()){
+                            h2 += StorageHouse.STACK_SIZE - stack.size();
+                            for (Box b : stack.getStack()){
+                                g2 += b.getDepartureDate();
+                            }
+                        }
+                        
+                        System.out.println("Antecesor " + antecesor.getNodeID() + " : " + g1 + " - Padre " + nextNode.getNodeID()  + " : " + g2); //DEBUG
+                        if (g1 < g2){
+                            //f = - (h2 + g2);
+                            //nextNode.setEvalFunction(f);
+                            System.out.println("Remove node " + successorNode.getNodeID() + " from CLOSE"); //DEBUG
+                            closed.remove(successorNode);
+                        }
+                        
+                        
+                    } else if (alreadyContains.equals("OPEN")){
+                        
+                        // Get new father. Node antecesor of s in closed list
+                        System.out.println("OEOE: " + open.indexOf(successorNode) + 1);
+                        GraphNode<State> antecesor = open.get(1);
+                        
+                        for(Stack stack : antecesor.getData().getStorageHouse().getStacks()){
+                            h1 += StorageHouse.STACK_SIZE - stack.size();
+                            for (Box b : stack.getStack()){
+                                g1 += b.getDepartureDate();
+                            }
+                        }
+                        
+                        for(Stack stack : s.getStorageHouse().getStacks()){
+                            h1 += StorageHouse.STACK_SIZE - stack.size();
+                            for (Box b : stack.getStack()){
+                                g1 += b.getDepartureDate();
+                            }
+                        }
+                        
+                        for(Stack stack : nextNode.getData().getStorageHouse().getStacks()){
+                            h2 += StorageHouse.STACK_SIZE - stack.size();
+                            for (Box b : stack.getStack()){
+                                g2 += b.getDepartureDate();
+                            }
+                        }
+                        
+                        System.out.println("Antecesor " + antecesor.getNodeID() + " : " + g1 + " - Padre " + nextNode.getNodeID()  + " : " + g2); //DEBUG
+                        if (g1 < g2){
+                            //f = - (h2 + g2);
+                            //nextNode.setEvalFunction(f);
+                            System.out.println("Remove node " + successorNode.getNodeID() + " from OPEN"); //DEBUG
+                            open.remove(successorNode);
+                        }
+                    } 
                 }
                  
             }//End of for
