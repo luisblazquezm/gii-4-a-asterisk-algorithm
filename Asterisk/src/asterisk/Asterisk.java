@@ -112,15 +112,15 @@ public class Asterisk {
             GraphNode<State> nextNode = open.remove(0);
             closed.add(0, nextNode);
             
-            System.out.println("\n\n====================================================");
+            System.out.println("\n\n===================================================="); //DEBUG
             System.out.println("-----------------     CLOSED    ----------------- ");  //DEBUG
-            System.out.println("====================================================");
+            System.out.println("===================================================="); //DEBUG
             //Util.printLists(closed, "CLOSED"); // DEBUG
-            System.out.println("\n\n=======================================================================");
+            System.out.println("\n\n======================================================================="); //DEBUG
             System.out.println("-----------------     ACTUAL STATE OF STORAGEHOUSE    ----------------- ");  //DEBUG
-            System.out.println("=======================================================================");
+            System.out.println("======================================================================="); //DEBUG
             System.out.print(nextNode.getData().getStorageHouse().toString());//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< KEEP THIS. DO NOT REMOVE. NOT DEBUG
-            System.out.printf("\n\n");
+            System.out.printf("\n\n"); //DEBUG
             
             // 3.3
             // If next node is goal, SUCCESS
@@ -174,6 +174,7 @@ public class Asterisk {
                     open.add(successorNode);
                     
                 } else {
+                    /////// THIS IS NOT NEEDED. WE DO the same thing IN UTILS.expand when checkLoops
                     // 1 - Decide if pointers should be modified (-> nextNode)
                     // 2 - Decided if pointers of children of elements
                     //     contained in closed should be modified as well
