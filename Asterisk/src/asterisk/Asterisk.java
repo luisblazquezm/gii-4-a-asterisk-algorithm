@@ -192,7 +192,7 @@ public class Asterisk {
                     // 1 - Decide if pointers should be modified (-> nextNode)
                     // 2 - Decided if pointers of children of elements
                     //     contained in closed should be modified as well
-                    
+                    /*
                     int g1 = 0;
                     int h1 = 0;
                     int g2 = 0;
@@ -264,7 +264,7 @@ public class Asterisk {
                             System.out.println("Remove node " + successorNode.getNodeID() + " from OPEN"); //DEBUG
                             open.remove(successorNode);
                         }
-                    } 
+                    } */
                 }
                  
             }//End of for

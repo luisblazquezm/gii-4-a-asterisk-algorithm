@@ -98,4 +98,13 @@ public class StorageHouse implements Cloneable{
             
         return new StorageHouse(newStacks); 
     } 
+
+    public boolean fullStacks() {
+        
+        for (int i = 0; i < NUMBER_OF_STACKS; i++ )
+            if (this.stacks[i].getStack().size() != STACK_SIZE)
+                return false;
+        
+        return true;
+    }
 }

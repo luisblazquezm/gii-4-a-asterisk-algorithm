@@ -34,7 +34,6 @@ public class Util {
                     g += b.getDepartureDate();
                 }
             }
-            System.out.println("h: " + h + " - g: " + g);
             f = - (h + g);
             n.setEvalFunction(f);
             
@@ -50,7 +49,8 @@ public class Util {
     }
     
     public static boolean isGoalState(State node){
-        return node.getProductionList().isEmpty();
+        return node.getProductionList().isEmpty() && 
+               node.getStorageHouse().fullStacks();
     }
     
     public static List<State> expand(State currentNode) throws CloneNotSupportedException
@@ -64,7 +64,6 @@ public class Util {
     {
         int j = 1;
         List<State> successors = new ArrayList<>();
-        
         List<Box> newProductionList = new ArrayList<>();
         
         // Copy the old production list into the new one we are going to test
@@ -75,52 +74,19 @@ public class Util {
             Logger.getLogger(Asterisk.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        Box currentBox = newProductionList.remove(0);
-        System.out.println("Remove(0) from New Production List returns = " + currentBox.getId());
-        
-        // ITerate over stacks
-        for (int i = 0; i < 5; ++i){
-            StorageHouse newStorageHouse = (StorageHouse) currentNode.getStorageHouse().clone();
-            newStorageHouse.addBox(currentBox, i); // Add new box in stack i
+        for (int boxID = 0; boxID < newProductionList.size(); boxID++){
             
-            /* DEBUG */
-            System.out.println("(NODE) STORAGEHOUSE INTENTO EN NIVEL " + recursivityLevel + " metiendo caja en la pila " + (i + 1));
-            for (Stack s : newStorageHouse.getStacks()){
-                System.out.printf("Stack " + j + " = [ ");
-                for (Box b : s.getStack())
-                    System.out.printf(b.getDepartureDate() + ", ");
-                System.out.printf(" ]\n");
-                j++;
-            }
-            j = 1;
-            /* DEBUG */
-            
-            State nextNode = new State(
-                            newProductionList,
-                            newStorageHouse
-                    );
-           
-            boolean shouldAdd = true;
-            
-            if (checkLoops){
-                List<State> nextNodeSuccessors = expand(nextNode, recursivityLevel+1, false);
-                /*
-                for (State n : nextNodeSuccessors){
-                    if (Util.compareNodes(n, currentNode)){
-                        System.out.println("FOUND LOOP. BREAKING ... ");
-                        shouldAdd = false;
-                        break;
-                    }
-                }
-                */
-            }
-            
-            if (shouldAdd){
-                /*DEBUG
-                System.out.println("\n---------------> Going to add nextNode in level " + recursivityLevel + "." + i); //DEBUG
-                
-                System.out.println("With StorageHouse:");
-                for (Stack s : nextNode.getStorageHouse().getStacks()){
+            Box currentBox = newProductionList.remove(boxID);
+            System.out.println("Remove(0) from New Production List returns = " + currentBox.getId());
+
+            // ITerate over stacks
+            for (int i = 0; i < 5; ++i){
+                StorageHouse newStorageHouse = (StorageHouse) currentNode.getStorageHouse().clone();
+                newStorageHouse.addBox(currentBox, i); // Add new box in stack i
+
+                /* DEBUG */
+                System.out.println("(NODE) STORAGEHOUSE INTENTO EN NIVEL " + recursivityLevel + " metiendo caja en la pila " + (i + 1));
+                for (Stack s : newStorageHouse.getStacks()){
                     System.out.printf("Stack " + j + " = [ ");
                     for (Box b : s.getStack())
                         System.out.printf(b.getDepartureDate() + ", ");
@@ -128,12 +94,48 @@ public class Util {
                     j++;
                 }
                 j = 1;
-                System.out.println("\n");
-                DEBUG*/
-                successors.add(nextNode);
-            }
-            
-        }
+                /* DEBUG */
+
+                State nextNode = new State(
+                                newProductionList,
+                                newStorageHouse
+                        );
+
+                boolean shouldAdd = true;
+
+                if (checkLoops){
+                    List<State> nextNodeSuccessors = expand(nextNode, recursivityLevel+1, false);
+                    for (State n : nextNodeSuccessors){
+                        if (Util.compareNodes(n, currentNode)){
+                            System.out.println("FOUND LOOP. BREAKING ... ");
+                            shouldAdd = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (shouldAdd){
+                    /*DEBUG
+                    System.out.println("\n---------------> Going to add nextNode in level " + recursivityLevel + "." + i); //DEBUG
+
+                    System.out.println("With StorageHouse:");
+                    for (Stack s : nextNode.getStorageHouse().getStacks()){
+                        System.out.printf("Stack " + j + " = [ ");
+                        for (Box b : s.getStack())
+                            System.out.printf(b.getDepartureDate() + ", ");
+                        System.out.printf(" ]\n");
+                        j++;
+                    }
+                    j = 1;
+                    System.out.println("\n");
+                    DEBUG*/
+                    successors.add(nextNode);
+                }
+            } // For i
+
+        } // For box
+        
+        
         
         return successors;
     }
