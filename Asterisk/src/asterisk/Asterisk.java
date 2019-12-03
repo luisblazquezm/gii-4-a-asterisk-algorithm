@@ -96,11 +96,10 @@ public class Asterisk {
         List<GraphNode> open = new ArrayList<>();
         int countNodeID = 0; //DEBUG
         int iterationNum = 1; //DEBUG
-        GraphNode<State> oldSuccessor = null;
         
         /* Initialize open with the first node of G */
         GraphNode<State> initialStateNode = new GraphNode<>(initialState);
-        initialStateNode.setNodeID(countNodeID++); // DEBUG
+        initialStateNode.setNodeID(countNodeID++); // DEBUG just to have a count of the ID of the nodes
         graph.addVertex(initialStateNode);
         open.add(initialStateNode);
         
@@ -111,16 +110,15 @@ public class Asterisk {
         boolean success = false;
         while(true){
             
-            System.out.println("\n\n\t\t\t\t\t\t--------------------------------------");  //DEBUG
-            System.out.println("\t\t\t\t\t\t|       ITERATION " + iterationNum + "                  |");  //DEBUG
-            System.out.println("\t\t\t\t\t\t--------------------------------------");  //DEBUG
-            System.out.println("Looping with open.size: " + open.size());  //DEBUG
-            
+            /* DEBUG */
+            System.out.println("\n\n\t\t\t\t\t\t--------------------------------------");
+            System.out.println("\t\t\t\t\t\t|       ITERATION " + iterationNum + "                  |");
+            System.out.println("\t\t\t\t\t\t--------------------------------------");
+            System.out.println("Looping with open.size: " + open.size());
             System.out.println("====================================================");
-            System.out.println("-----------------     OPEN    ----------------- ");  //DEBUG
+            System.out.println("-----------------     OPEN    ----------------- ");
             System.out.println("====================================================");
-            //Util.printLists(open, "OPEN"); // DEBUG
-
+            /* DEBUG */
             
             // 3.1
             // If open is empty, FAILURE
@@ -139,20 +137,24 @@ public class Asterisk {
                 System.out.print(n.getNodeID() + ", ");
             }
             
+            /* DEBUG */
             System.out.println("\n\n====================================================");
-            System.out.println("-----------------     CLOSED    ----------------- ");  //DEBUG
+            System.out.println("-----------------     CLOSED    ----------------- ");  
             System.out.println("====================================================");
-            //Util.printLists(closed, "CLOSED"); // DEBUG
+            /* DEBUG */
+
             //DEBUG
             for(GraphNode<State> n : closed){
                 System.out.print(n.getNodeID() + ", ");
             }
             
+            /* DEBUG */
             System.out.println("\n\n================================================================================");
-            System.out.println(String.format("-----------------     ACTUAL STATE OF STORAGEHOUSE: NODE (%d)  ----------------- ", nextNode.getNodeID()));  //DEBUG
+            System.out.println(String.format("-----------------     ACTUAL STATE OF STORAGEHOUSE: NODE (%d)  ----------------- ", nextNode.getNodeID())); 
             System.out.println("================================================================================");
             System.out.print(nextNode.getData().getStorageHouse().toString());//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< KEEP THIS. DO NOT REMOVE. NOT DEBUG
             System.out.printf("\n\n");
+            /* DEBUG */
             
             // 3.3
             // If next node is goal, SUCCESS
@@ -165,12 +167,6 @@ public class Asterisk {
             // Expand node and add successors to graph (successors = M)
             List<State> successors = Util.expand(nextNode.getData());
             
-            /*
-            if (successors.isEmpty()){
-                closed.remove(0);
-            }
-            */
-            
             for (State s : successors){
                 
                 // Add to graph G
@@ -178,9 +174,11 @@ public class Asterisk {
                 successorNode.setNodeID(countNodeID++);
                 graph.addVertex(successorNode);
                 
-                System.out.println("\n\n===================================================="); //DEBUG
-                System.out.println("SUCCESSOR: " + successorNode.getNodeID() + " of FATHER: " + nextNode.getNodeID() + "\n"); //DEBUG
-                System.out.println("====================================================\n"); //DEBUG
+                /* DEBUG */
+                System.out.println("\n\n===================================================="); 
+                System.out.println("SUCCESSOR: " + successorNode.getNodeID() + " of FATHER: " + nextNode.getNodeID() + "\n");
+                System.out.println("====================================================\n"); 
+                /* DEBUG */
                 
                 // Create pointers from nextNode to every successor that was not
                 // in open or closed
@@ -203,7 +201,6 @@ public class Asterisk {
                     for (GraphNode<State> n : closed){
                         System.out.println("\nTrying with node: " + n.getNodeID() +"\n"); //DEBUG
                         if (Util.compareNodes(n.getData(), s)){
-                            oldSuccessor = n;
                             System.out.println("IT IS IN CLOSED\n"); //DEBUG
                             alreadyContains = "CLOSED";
                             break;
@@ -214,6 +211,7 @@ public class Asterisk {
                 // If it was not contained in open nor closed, create edges
                 // from nextNode to s in graph
                 if (alreadyContains.equals("NONE")) {
+                    
                     // 3.5
                     // Create edge (here succesorNode is m')
                     graph.addEdge(successorNode, nextNode);
@@ -227,92 +225,18 @@ public class Asterisk {
                     // 2 - Decided if pointers of children of elements
                     //     contained in closed should be modified as well
                     
-                    int g1 = 0;
-                    int h1 = 0;
-                    int g2 = 0;
-                    int h2 = 0;
-                    int f1 = 0;
-                    int f2 = 0;
-                    
                     System.out.println("TREAT SUCCESOR in " + alreadyContains); //DEBUG
                     if (alreadyContains.equals("CLOSED")){
                         // Do point 2
                         System.out.println("Remove node " + nextNode.getNodeID() + " from CLOSE"); //DEBUG
-                        closed.remove(nextNode); // DEBUG
+                        closed.remove(nextNode); ////////////////////////// Check if returns -1 or not
                         continue;
-                        
-                        /*
-                        for(Stack stack : s.getStorageHouse().getStacks()){
-                            h1 += StorageHouse.STACK_SIZE - stack.size();
-                            for (Box b : stack.getStack()){
-                                g1 += b.getDepartureDate();
-                            }
-                        }
-                        
-                        for(Stack stack : oldSuccessor.getData().getStorageHouse().getStacks()){
-                            h2 += StorageHouse.STACK_SIZE - stack.size();
-                            for (Box b : stack.getStack()){
-                                g2 += b.getDepartureDate();
-                            }
-                        }
-                        
-                        f1 = -(h1 +g1); //DEBUG
-                        f2 = -(h2 +g2); //DEBUG
-                        
-                        // They are both the same node. But we will take the one with less cost
-                        System.out.println("Sucesor encontrado en cerrados " + oldSuccessor.getNodeID() + " : " + f1 + " - Nuevo sucesor " + successorNode.getNodeID()  + " : " + f2); //DEBUG
-                        if (g1 < g2){
-                            //f = - (h2 + g2);
-                            //nextNode.setEvalFunction(f);
-                            System.out.println("Remove node " + nextNode.getNodeID() + " from CLOSE"); //DEBUG
-                            // closed.remove(succesorNode);
-                            //break; //DEBUG
-                        }
-                        */
-                        
                     } 
-                    /*else if (alreadyContains.equals("OPEN")){
-                        
-                        // Get new father. Node antecesor of s in closed list
-                        System.out.println("OEOE: " + open.indexOf(successorNode) + 1);
-                        GraphNode<State> antecesor = open.get(1);
-                        
-                        for(Stack stack : antecesor.getData().getStorageHouse().getStacks()){
-                            h1 += StorageHouse.STACK_SIZE - stack.size();
-                            for (Box b : stack.getStack()){
-                                g1 += b.getDepartureDate();
-                            }
-                        }
-                        
-                        for(Stack stack : s.getStorageHouse().getStacks()){
-                            h1 += StorageHouse.STACK_SIZE - stack.size();
-                            for (Box b : stack.getStack()){
-                                g1 += b.getDepartureDate();
-                            }
-                        }
-                        
-                        for(Stack stack : nextNode.getData().getStorageHouse().getStacks()){
-                            h2 += StorageHouse.STACK_SIZE - stack.size();
-                            for (Box b : stack.getStack()){
-                                g2 += b.getDepartureDate();
-                            }
-                        }
-                        
-                        System.out.println("Antecesor " + antecesor.getNodeID() + " : " + g1 + " - Padre " + nextNode.getNodeID()  + " : " + g2); //DEBUG
-                        if (g1 < g2){
-                            //f = - (h2 + g2);
-                            //nextNode.setEvalFunction(f);
-                            System.out.println("Remove node " + successorNode.getNodeID() + " from OPEN"); //DEBUG
-                            open.remove(successorNode);
-                        }
-                      
-                    } 
-                    */
                 }
                  
             }//End of for
             
-            // 3.8
+            // 3.8 Sort the Open list in order applying the heuristic evaluation function
             try {
                 System.out.println("Apply heuristic");
                 Util.heuristicOrder(open);  // Complains because of Exception
@@ -320,7 +244,7 @@ public class Asterisk {
                 Logger.getLogger(Asterisk.class.getName()).log(Level.SEVERE, null, ex);
             }
                 
-            iterationNum++;
+            iterationNum++; //DEBUG
             
         }// End of while
         

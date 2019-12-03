@@ -44,7 +44,7 @@ public class StorageHouse implements Cloneable{
             if (this.stacks[position].size() == 0){
                 this.stacks[position].push(box);
                 return true;
-            } else if (this.stacks[position].size() < STACK_SIZE && !Util.invalidStack(this.stacks[position], box)) { ////////////////////////////////////////////<<<< CHANGED THIS
+            } else if (this.stacks[position].size() < STACK_SIZE && !Util.invalidStack(this.stacks[position], box)) { 
                 this.stacks[position].push(box);
                 return true;
             }
@@ -53,13 +53,9 @@ public class StorageHouse implements Cloneable{
     }
 
     public boolean equals(StorageHouse storageHouse){
-        //if (this.stacks.length != storageHouse.getStacks().length) return false;
-        //System.out.println("JEJE: " + this.stacks.length);
         for (int i = 0; i < this.stacks.length; i++){
-            //System.out.println(String.format("(PILA %d) this.stacks.length = (%d), storageHouse.getStacks().length = (%d)", i + 1, this.stacks[i].size(), storageHouse.getStacks()[i].size())); ///// DEBUG
             if (this.stacks[i].size() != storageHouse.getStacks()[i].size()) return false;
             if (!this.stacks[i].equals(storageHouse.getStacks()[i])){
-                //System.out.println("\nNot equals stack. Returns False\n"); // Debug
                 return false;
             }
         }
@@ -74,8 +70,6 @@ public class StorageHouse implements Cloneable{
         for (int i = 0; i < STACK_SIZE; ++i) {
             sb.append(String.format("Pos %d ", i + 1));
             for (int j = 0; j < NUMBER_OF_STACKS; ++j) {
-                //System.out.printf(String.format("\n\nDEGUG: stacks[%d].size() = %d &&", j, stacks[j].size())); //DEBUG
-                //System.out.printf(" stacks[" + j + "].peek(" + i + ") = " + stacks[j].peek(i) + "\n\n"); //DEBUG
                 if (stacks[j].size() > i && stacks[j].peek(i) != null) {
                     sb.append(String.format("|_ %2d _|   ", stacks[j].peek(i).getDepartureDate()));
                 } else {

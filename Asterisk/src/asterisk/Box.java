@@ -24,8 +24,7 @@ public class Box implements Cloneable{
     }
     
     public boolean equals(Box b2) {
-        return (/*this.getId() == b2.getId()
-                &&*/ this.getArrivalDate() == b2.getArrivalDate()
+        return (this.getArrivalDate() == b2.getArrivalDate()
                 && this.getDepartureDate() == b2.getDepartureDate()
                 );
     }
