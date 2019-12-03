@@ -16,15 +16,18 @@ public class State{
     
     private List<Box> productionList;
     private StorageHouse storageHouse;
+    private boolean valid;
 
     public State(){
         this.productionList = new ArrayList<>();
         this.storageHouse = new StorageHouse();
+        this.valid = true;
     }
     
     public State(List<Box> productionList, StorageHouse storageHouse) {
         this.productionList = productionList;
         this.storageHouse = storageHouse;
+        this.valid = true;
     }
     
     /**
@@ -54,5 +57,21 @@ public class State{
     public void setStorageHouse(StorageHouse storageHouse) {
         this.storageHouse = storageHouse;
     }
+
+    /**
+     * @return the isValid
+     */
+    public boolean isValid() {
+        return valid;
+    }
+
+    /**
+     * @param isValid the isValid to set
+     */
+    public void setValid(boolean isValid) {
+        this.valid = isValid;
+    }
+    
+    
 
 }

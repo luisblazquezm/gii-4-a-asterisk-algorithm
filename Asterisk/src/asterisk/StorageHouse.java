@@ -56,10 +56,10 @@ public class StorageHouse implements Cloneable{
         //if (this.stacks.length != storageHouse.getStacks().length) return false;
         //System.out.println("JEJE: " + this.stacks.length);
         for (int i = 0; i < this.stacks.length; i++){
-            //System.out.println(String.format("(STACK %d) this.stacks.length = (%d), storageHouse.getStacks().length = (%d)", i, this.stacks[i].size(), storageHouse.getStacks()[i].size())); ///// DEBUG
+            //System.out.println(String.format("(PILA %d) this.stacks.length = (%d), storageHouse.getStacks().length = (%d)", i + 1, this.stacks[i].size(), storageHouse.getStacks()[i].size())); ///// DEBUG
             if (this.stacks[i].size() != storageHouse.getStacks()[i].size()) return false;
             if (!this.stacks[i].equals(storageHouse.getStacks()[i])){
-                //System.out.println("Not equals stack. Returns False"); // Debug
+                //System.out.println("\nNot equals stack. Returns False\n"); // Debug
                 return false;
             }
         }

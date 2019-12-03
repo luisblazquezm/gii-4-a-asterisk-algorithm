@@ -60,7 +60,7 @@ public class Stack implements Cloneable{
     public boolean equals(Stack stack){
         //System.out.println("YE"); //DEBUG
         for (int i = 0; i < stack.size(); i++){
-            //System.out.println(String.format("(BOX %d) Equals: %b", i, this.stack.get(i).equals(stack.getStack().get(i)))); ///// DEBUG
+            //System.out.println(String.format("(CAJA %d) Equals: %b", i, this.stack.get(i).equals(stack.getStack().get(i)))); ///// DEBUG
             if (!this.stack.get(i).equals(stack.getStack().get(i)))
                 return false;
         }
