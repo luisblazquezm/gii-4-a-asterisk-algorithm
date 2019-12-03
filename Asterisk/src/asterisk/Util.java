@@ -74,9 +74,8 @@ public class Util {
             Logger.getLogger(Asterisk.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        for (int boxID = 0; boxID < newProductionList.size(); boxID++){
             
-            Box currentBox = newProductionList.remove(boxID);
+            Box currentBox = newProductionList.remove(0);
             System.out.println("Remove(0) from New Production List returns = " + currentBox.getId());
 
             // ITerate over stacks
@@ -113,8 +112,10 @@ public class Util {
                         }
                     }
                 }
+                
+                
 
-                if (shouldAdd){
+                if (shouldAdd && checkLoops){
                     /*DEBUG
                     System.out.println("\n---------------> Going to add nextNode in level " + recursivityLevel + "." + i); //DEBUG
 
@@ -133,9 +134,20 @@ public class Util {
                 }
             } // For i
 
-        } // For box
+        System.out.println("Number of succesors in LEVEL " + recursivityLevel + ": " + successors.size());
+        System.out.printf("[ ");//DEBUG
+        //DEBUG
+        for (State s : successors){
+           System.out.printf(s + ", ");
+        }
+        System.out.println(" ]");//DEBUG
         
-        
+        /*
+        if (successors.isEmpty() && checkLoops){
+            System.out.println("Esta vacio!!!!!");
+            currentNode.getProductionList().add(currentBox);
+        }
+        */
         
         return successors;
     }

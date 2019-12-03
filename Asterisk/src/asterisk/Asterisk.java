@@ -206,6 +206,7 @@ public class Asterisk {
                         // Get new father. Node antecesor of s in closed list
                         System.out.println("OEOE: " + closed.indexOf(successorNode) + 1);
                         GraphNode<State> antecesor = closed.get(1);
+                        System.out.println("Antecesor: " + antecesor.getNodeID() + " - successorNode +1 :" + closed.get(1).getNodeID());
                         
                         for(Stack stack : antecesor.getData().getStorageHouse().getStacks()){
                             h1 += StorageHouse.STACK_SIZE - stack.size();
