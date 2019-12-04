@@ -99,6 +99,7 @@ public class Asterisk {
         
         /* Initialize open with the first node of G */
         GraphNode<State> initialStateNode = new GraphNode<>(initialState);
+        GraphNode<State> goalNode = new GraphNode<>();
         initialStateNode.setNodeID(countNodeID++); // DEBUG just to have a count of the ID of the nodes
         graph.addVertex(initialStateNode);
         open.add(initialStateNode);
@@ -107,10 +108,10 @@ public class Asterisk {
         // MAIN LOOP
         // ====================================================================
 
-        boolean success = false;
+        boolean solutionFound = false;
         while(true){
             
-            /* DEBUG */
+            /* DEBUG
             System.out.println("\n\n\t\t\t\t\t\t--------------------------------------");
             System.out.println("\t\t\t\t\t\t|       ITERATION " + iterationNum + "                  |");
             System.out.println("\t\t\t\t\t\t--------------------------------------");
@@ -118,12 +119,12 @@ public class Asterisk {
             System.out.println("====================================================");
             System.out.println("-----------------     OPEN    ----------------- ");
             System.out.println("====================================================");
-            /* DEBUG */
+            DEBUG */
             
             // 3.1
             // If open is empty, FAILURE
             if (open.isEmpty()) {
-                success = false;
+                solutionFound = false;
                 break;
             }
             
@@ -132,34 +133,31 @@ public class Asterisk {
             GraphNode<State> nextNode = open.remove(0);
             closed.add(0, nextNode);
             
-            //DEBUG
+            /* DEBUG 
             for(GraphNode<State> n : open){
                 System.out.print(n.getNodeID() + ", ");
             }
             
-            /* DEBUG */
             System.out.println("\n\n====================================================");
             System.out.println("-----------------     CLOSED    ----------------- ");  
             System.out.println("====================================================");
-            /* DEBUG */
 
-            //DEBUG
             for(GraphNode<State> n : closed){
                 System.out.print(n.getNodeID() + ", ");
             }
             
-            /* DEBUG */
             System.out.println("\n\n================================================================================");
             System.out.println(String.format("-----------------     ACTUAL STATE OF STORAGEHOUSE: NODE (%d)  ----------------- ", nextNode.getNodeID())); 
             System.out.println("================================================================================");
             System.out.print(nextNode.getData().getStorageHouse().toString());//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< KEEP THIS. DO NOT REMOVE. NOT DEBUG
             System.out.printf("\n\n");
-            /* DEBUG */
+            DEBUG */
             
             // 3.3
             // If next node is goal, SUCCESS
             if (Util.isGoalState(nextNode.getData())){ 
-                success = true;
+                goalNode = nextNode;
+                solutionFound = true;
                 break;
             }
             
@@ -174,11 +172,11 @@ public class Asterisk {
                 successorNode.setNodeID(countNodeID++);
                 graph.addVertex(successorNode);
                 
-                /* DEBUG */
+                /* DEBUG
                 System.out.println("\n\n===================================================="); 
                 System.out.println("SUCCESSOR: " + successorNode.getNodeID() + " of FATHER: " + nextNode.getNodeID() + "\n");
                 System.out.println("====================================================\n"); 
-                /* DEBUG */
+                DEBUG */
                 
                 // Create pointers from nextNode to every successor that was not
                 // in open or closed
@@ -187,21 +185,21 @@ public class Asterisk {
                 // Check if contained in open
                 // Loops needed because cannot compare either State to
                 // GraphNode nor pointers one to each other
-                System.out.println("\n\nLet´s see if succesor is in OPEN"); //DEBUG
+                //System.out.println("\n\nLet´s see if succesor is in OPEN"); //DEBUG
                 for (GraphNode<State> n : open){
                     if (Util.compareNodes(n.getData(), s)){
-                        System.out.println("IT IS IN OPEN\n"); //DEBUG
+                        //System.out.println("IT IS IN OPEN\n"); //DEBUG
                         alreadyContains = "OPEN";
                         break;
                     }
                 }
                 
-                System.out.println("\n\nLet´s see if succesor is in CLOSED\n"); //DEBUG
+                //System.out.println("\n\nLet´s see if succesor is in CLOSED\n"); //DEBUG
                 if (alreadyContains.equals("NONE")){
                     for (GraphNode<State> n : closed){
-                        System.out.println("\nTrying with node: " + n.getNodeID() +"\n"); //DEBUG
+                        //System.out.println("\nTrying with node: " + n.getNodeID() +"\n"); //DEBUG
                         if (Util.compareNodes(n.getData(), s)){
-                            System.out.println("IT IS IN CLOSED\n"); //DEBUG
+                            //System.out.println("IT IS IN CLOSED\n"); //DEBUG
                             alreadyContains = "CLOSED";
                             break;
                         }
@@ -214,7 +212,7 @@ public class Asterisk {
                     
                     // 3.5
                     // Create edge (here succesorNode is m')
-                    graph.addEdge(successorNode, nextNode);
+                    graph.addEdge(successorNode, nextNode);        
                     
                     // 3.6
                     // Use this loop to add to open as well
@@ -225,11 +223,13 @@ public class Asterisk {
                     // 2 - Decided if pointers of children of elements
                     //     contained in closed should be modified as well
                     
-                    System.out.println("TREAT SUCCESOR in " + alreadyContains); //DEBUG
+                    //System.out.println("TREAT SUCCESOR in " + alreadyContains); //DEBUG
                     if (alreadyContains.equals("CLOSED")){
                         // Do point 2
                         System.out.println("Remove node " + nextNode.getNodeID() + " from CLOSE"); //DEBUG
-                        closed.remove(nextNode); ////////////////////////// Check if returns -1 or not
+                        boolean itsDeleted = closed.remove(nextNode); ////////////////////////// Check if returns -1 or not
+                        if (itsDeleted != false) System.out.println("SE ELIMINA"); //DEBUG
+                        else System.out.println("NO SE ELIMINA"); //DEBUG
                         continue;
                     } 
                 }
@@ -238,7 +238,7 @@ public class Asterisk {
             
             // 3.8 Sort the Open list in order applying the heuristic evaluation function
             try {
-                System.out.println("Apply heuristic");
+                //System.out.println("Apply heuristic");
                 Util.heuristicOrder(open);  // Complains because of Exception
             } catch (Exception ex) {
                 Logger.getLogger(Asterisk.class.getName()).log(Level.SEVERE, null, ex);
@@ -248,8 +248,11 @@ public class Asterisk {
             
         }// End of while
         
-        if (success){
-            // Return solution, SUCCESS
+        if (solutionFound){
+            
+            // Print states from goalState node to initialState node
+            graph.depthFirstPrintPath(goalNode);
+            
             System.out.println("SUCCESS");
         } else {
             // Return FALIURE

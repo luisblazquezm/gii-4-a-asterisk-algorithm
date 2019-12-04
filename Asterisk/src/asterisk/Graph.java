@@ -242,25 +242,22 @@ public class Graph<T> {
     * @return true if a path exists between source and destination nodes, false if otherwise.
     * @
     */
-    public List<GraphNode> depthFirstPrintPath(GraphNode<T> source, GraphNode<T> destination) {
+    public void depthFirstPrintPath(GraphNode<State> destination) {
         List<GraphNode> path = new ArrayList<>();
-        if(!this.adjacencyMap.containsKey(source) || !this.adjacencyMap.containsKey(destination)) {
-            return null;
+        if(!this.adjacencyMap.containsKey(destination)) {
+            return ;
         }
-        path.add(source);
-        Stack<GraphNode<T>> stack = new Stack<>();
-        stack.push(source);
-        try {
-            return depthFirstPrintPath(stack, destination, path);
-        } catch (Exception ex) {
-            Logger.getLogger(Graph.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
+        
+        Util.printStorageHouseState(destination.getData().getStorageHouse());
+        
+        HashSet<GraphNode<T>> nodesConnected = this.adjacencyMap.get(destination);
+        while(nodesConnected.iterator().hasNext()){
+            
+            GraphNode<State> antecesor = (GraphNode<State>) nodesConnected.iterator().next();
+            Util.printStorageHouseState(antecesor.getData().getStorageHouse());
+            
+            nodesConnected = this.adjacencyMap.get(antecesor);
         }
-    }
-    private List<GraphNode> depthFirstPrintPath(Stack<GraphNode<T>> stack, 
-                                                GraphNode<T> destination,
-                                                List<GraphNode> currentPath) throws Exception {
-        throw new Exception("depthFirstPrintPath: Not implemented yet.");
     }
 
 }

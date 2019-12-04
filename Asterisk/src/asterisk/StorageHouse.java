@@ -65,10 +65,16 @@ public class StorageHouse implements Cloneable{
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("       Pila 1     Pila 2     Pila 3     Pila 4     Pila 5\n");
-        sb.append("      ________   ________   ________   ________   ________\n");
+        sb.append("         Pila 1     Pila 2     Pila 3     Pila 4     Pila 5\n");
+        sb.append("        ________   ________   ________   ________   ________\n");
+        
+        
         for (int i = 0; i < STACK_SIZE; ++i) {
-            sb.append(String.format("Pos %d ", i + 1));
+            
+            if (i == 3) sb.append("Top     ");
+            else if (i == 0) sb.append("Bottom  ");
+            else sb.append("        ");
+            
             for (int j = 0; j < NUMBER_OF_STACKS; ++j) {
                 if (stacks[j].size() > i && stacks[j].peek(i) != null) {
                     sb.append(String.format("|_ %2d _|   ", stacks[j].peek(i).getDepartureDate()));

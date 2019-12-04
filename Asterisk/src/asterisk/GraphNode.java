@@ -14,6 +14,7 @@ public class GraphNode<T> implements Comparable<GraphNode> {
     private T data;
     private int nodeID;
     private int evalFunction;
+    private GraphNode<T> antecesor;
 
     public GraphNode() {}
 
@@ -48,5 +49,19 @@ public class GraphNode<T> implements Comparable<GraphNode> {
     @Override
     public int compareTo(GraphNode n) {
         return this.evalFunction - n.evalFunction;
+    }
+
+    /**
+     * @return the antecesor
+     */
+    public GraphNode<T> getAntecesor() {
+        return antecesor;
+    }
+
+    /**
+     * @param antecesor the antecesor to set
+     */
+    public void setAntecesor(GraphNode<T> antecesor) {
+        this.antecesor = antecesor;
     }
 }

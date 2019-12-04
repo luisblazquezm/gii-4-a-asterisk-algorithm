@@ -32,6 +32,15 @@ public class Stack implements Cloneable{
             return null;
         }
     }
+    
+    public Box printPop() {
+        if(!stack.isEmpty()){
+            Box box = getStack().get(0);
+            return box;
+        } else {
+            return null;
+        }
+    }
 
     public Box peek() {
         if(!stack.isEmpty()) {
