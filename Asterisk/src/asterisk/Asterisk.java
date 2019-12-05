@@ -99,6 +99,7 @@ public class Asterisk {
         
         /* Initialize open with the first node of G */
         GraphNode<State> initialStateNode = new GraphNode<>(initialState);
+        GraphNode<State> oldSuccessor = new GraphNode<>();
         GraphNode<State> goalNode = new GraphNode<>();
         initialStateNode.setNodeID(countNodeID++); // DEBUG just to have a count of the ID of the nodes
         graph.addVertex(initialStateNode);
@@ -189,6 +190,7 @@ public class Asterisk {
                 for (GraphNode<State> n : open){
                     if (Util.compareNodes(n.getData(), s)){
                         //System.out.println("IT IS IN OPEN\n"); //DEBUG
+                        oldSuccessor = n;
                         alreadyContains = "OPEN";
                         break;
                     }
@@ -200,6 +202,7 @@ public class Asterisk {
                         //System.out.println("\nTrying with node: " + n.getNodeID() +"\n"); //DEBUG
                         if (Util.compareNodes(n.getData(), s)){
                             //System.out.println("IT IS IN CLOSED\n"); //DEBUG
+                            oldSuccessor = n;
                             alreadyContains = "CLOSED";
                             break;
                         }
@@ -226,11 +229,28 @@ public class Asterisk {
                     //System.out.println("TREAT SUCCESOR in " + alreadyContains); //DEBUG
                     if (alreadyContains.equals("CLOSED")){
                         // Do point 2
+                        
+                        // oldSuccessor es el antecesor de succesorNode (cogerlo)
+                        
+                        // Calcular por cual de ellos se llega al camino mínimo
+                        int f1 = Util.getEvalFunctionValue(successorNode);
+                        int f2 = Util.getEvalFunctionValue(oldSuccessor);
+                        
+                        // El viejo sucesor tiene el camino más corto
+                        if (f1 < f2){
+                            // oldSuccessor.antecesor es nextNode (el padre)
+                            // Eliminar sucesor de cerrados
+                            // Añadir oldSuccessor a los sucesores de nextNode (el padre)
+                        }
+                        
+                        
+                        /* THIS WORKS
                         System.out.println("Remove node " + nextNode.getNodeID() + " from CLOSE"); //DEBUG
                         boolean itsDeleted = closed.remove(nextNode); ////////////////////////// Check if returns -1 or not
                         if (itsDeleted != false) System.out.println("SE ELIMINA"); //DEBUG
                         else System.out.println("NO SE ELIMINA"); //DEBUG
                         continue;
+                        */
                     } 
                 }
                  

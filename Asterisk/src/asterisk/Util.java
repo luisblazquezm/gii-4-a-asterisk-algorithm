@@ -34,8 +34,8 @@ public class Util {
                     g += b.getDepartureDate();
                 }
             }
-            f = - (h + g);
-            //f = - (h/5 + (g/30)*5); // Factor de 5 para priorizar las fechas de salida
+            //f = - (h + g);
+            f = - (h/5 + (g/30)*10); // Factor de 5 para priorizar las fechas de salida
             n.setEvalFunction(f);
             
             // Very important to reset values
@@ -222,6 +222,21 @@ public class Util {
         }
         
         System.out.println("\n");
+    }
+
+    public static int getEvalFunctionValue(GraphNode<State> node) {
+        
+        int h = 0, g = 0, f = 0;
+        
+        for(Stack stack : node.getData().getStorageHouse().getStacks()){
+            h += StorageHouse.STACK_SIZE - stack.size();
+            for (Box b : stack.getStack()){
+                g += b.getDepartureDate();
+            }
+        }
+        f = - (h + g);
+        
+        return f;
     }
     
 }
