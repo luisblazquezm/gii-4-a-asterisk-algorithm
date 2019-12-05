@@ -5,6 +5,9 @@
  */
 package asterisk;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author lgt12
@@ -16,7 +19,27 @@ public class GraphNode<T> implements Comparable<GraphNode> {
     private int evalFunction;
     private GraphNode<T> antecesor;
 
+    public GraphNode(T data,
+                     int nodeID,
+                     int evalFunction,
+                     GraphNode<T> antecesor) {
+
+        this.data = data;
+        this.nodeID = nodeID;
+        this.evalFunction = evalFunction;
+        this.antecesor = antecesor;
+        
+    }
+    
+    public GraphNode(GraphNode<T> graphNode, boolean clone) {
+        this.data = graphNode.data;
+    }
+    
     public GraphNode() {}
+    
+    public GraphNode(GraphNode<T> graphNode) {
+        this.data = graphNode.data;
+    }
 
     public GraphNode(T data) {
         this.data = data;
@@ -64,4 +87,5 @@ public class GraphNode<T> implements Comparable<GraphNode> {
     public void setAntecesor(GraphNode<T> antecesor) {
         this.antecesor = antecesor;
     }
+    
 }

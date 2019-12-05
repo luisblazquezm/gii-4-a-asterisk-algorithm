@@ -260,4 +260,19 @@ public class Graph<T> {
         }
     }
 
+    public List<GraphNode<State>> getChildren(GraphNode<State> node){
+        
+        List<GraphNode<State>> children = new ArrayList<>(); 
+        
+        for(GraphNode s : adjacencyMap.keySet()){
+            HashSet<GraphNode<T>> currentParents = adjacencyMap.get(s);
+            for (GraphNode p : currentParents){
+                if(Util.compareNodes(node.getData(), (State) p.getData())) {
+                    children.add(s);
+                }
+            }
+        }
+        
+        return children;
+    }
 }

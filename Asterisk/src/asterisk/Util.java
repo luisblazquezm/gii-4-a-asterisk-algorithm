@@ -224,19 +224,56 @@ public class Util {
         System.out.println("\n");
     }
 
-    public static int getEvalFunctionValue(GraphNode<State> node) {
+    public static int getCostValue(GraphNode<State> node) {
         
-        int h = 0, g = 0, f = 0;
+        int g = 0;
         
         for(Stack stack : node.getData().getStorageHouse().getStacks()){
-            h += StorageHouse.STACK_SIZE - stack.size();
             for (Box b : stack.getStack()){
                 g += b.getDepartureDate();
             }
         }
-        f = - (h + g);
         
-        return f;
+        return g;
     }
     
+    public static GraphNode<State> clone(GraphNode<State> node) throws CloneNotSupportedException {
+        List<Box> newProductionList = new ArrayList<>();
+        newProductionList.addAll(node.getData().getProductionList());
+        State newSuccessor = new State(
+                    newProductionList,
+                    node.getData().getStorageHouse().clone()
+            );
+        ;
+        
+        return new GraphNode<>(newSuccessor);
+    }
+    
+    public static void updatePointers(GraphNode<State> node,
+                                      GraphNode<State> newParent,
+                                      GraphNode<State> oldParent,
+                                      List<GraphNode> closed) throws CloneNotSupportedException{
+         // Do point 2
+                                                
+        // Calcular por cual de ellos se llega al camino mínimo
+        int g1 = Util.getCostValue(newParent);  // New father
+        int g2 = Util.getCostValue(oldParent); // Old father
+
+        // El viejo sucesor tiene el camino más corto
+        if (g1 > g2){
+            // oldSuccessor.antecesor es nextNode (el padre)
+            node.setAntecesor(Util.clone(newParent));
+
+            List<GraphNode<State>> children = new ArrayList<>();
+            
+            // Eliminar nuevo padre de cerrados
+            for (GraphNode child : closed){
+                if (Util.compareNodes((State)child.getAntecesor().getData(), oldParent.getData())){
+                    children.add(child);
+                }
+            }
+            
+            Util.updatePointers();
+        }
+    }
 }

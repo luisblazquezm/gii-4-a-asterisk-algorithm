@@ -82,7 +82,7 @@ public class Asterisk {
          *              M' = M - (OPEN U CLOSED) (elements of M not contained
          *              in OPEN or CLOSED).
          *         3.6. Add M' to OPEN
-         *         3.7. For each 'm' in M' contained in OPEN or CLOSED
+         *         3.7. For each 'm' in M contained in OPEN or CLOSED
          *             3.7.1. If [CONDITION MUST BE SELECTED] change pointers
          *                    to 'n'.
          *                 3.7.1.1. If 'm' contained in CLOSED, for each child
@@ -99,7 +99,6 @@ public class Asterisk {
         
         /* Initialize open with the first node of G */
         GraphNode<State> initialStateNode = new GraphNode<>(initialState);
-        GraphNode<State> oldSuccessor = new GraphNode<>();
         GraphNode<State> goalNode = new GraphNode<>();
         initialStateNode.setNodeID(countNodeID++); // DEBUG just to have a count of the ID of the nodes
         graph.addVertex(initialStateNode);
@@ -169,7 +168,7 @@ public class Asterisk {
             for (State s : successors){
                 
                 // Add to graph G
-                GraphNode successorNode = new GraphNode<>(s);
+                GraphNode<State> successorNode = new GraphNode<>(s);
                 successorNode.setNodeID(countNodeID++);
                 graph.addVertex(successorNode);
                 
@@ -187,10 +186,11 @@ public class Asterisk {
                 // Loops needed because cannot compare either State to
                 // GraphNode nor pointers one to each other
                 //System.out.println("\n\nLet´s see if succesor is in OPEN"); //DEBUG
+                GraphNode<State> oldParent = new GraphNode<>();
                 for (GraphNode<State> n : open){
                     if (Util.compareNodes(n.getData(), s)){
                         //System.out.println("IT IS IN OPEN\n"); //DEBUG
-                        oldSuccessor = n;
+                        oldParent = n.getAntecesor();
                         alreadyContains = "OPEN";
                         break;
                     }
@@ -202,7 +202,7 @@ public class Asterisk {
                         //System.out.println("\nTrying with node: " + n.getNodeID() +"\n"); //DEBUG
                         if (Util.compareNodes(n.getData(), s)){
                             //System.out.println("IT IS IN CLOSED\n"); //DEBUG
-                            oldSuccessor = n;
+                            oldParent = n.getAntecesor();
                             alreadyContains = "CLOSED";
                             break;
                         }
@@ -215,11 +215,14 @@ public class Asterisk {
                     
                     // 3.5
                     // Create edge (here succesorNode is m')
-                    graph.addEdge(successorNode, nextNode);        
+                    graph.addEdge(successorNode, nextNode);      
+                    
+                    // Crete pointer from successor to father (nextNode)
+                    successorNode.setAntecesor(nextNode);
                     
                     // 3.6
                     // Use this loop to add to open as well
-                    open.add(successorNode);
+                    open.add(Util.clone(successorNode));
                     
                 } else {
                     // 1 - Decide if pointers should be modified (-> nextNode)
@@ -227,31 +230,33 @@ public class Asterisk {
                     //     contained in closed should be modified as well
                     
                     //System.out.println("TREAT SUCCESOR in " + alreadyContains); //DEBUG
-                    if (alreadyContains.equals("CLOSED")){
-                        // Do point 2
-                        
-                        // oldSuccessor es el antecesor de succesorNode (cogerlo)
+                    if (alreadyContains.equals("OPEN")) {
                         
                         // Calcular por cual de ellos se llega al camino mínimo
-                        int f1 = Util.getEvalFunctionValue(successorNode);
-                        int f2 = Util.getEvalFunctionValue(oldSuccessor);
+                        int g1 = Util.getCostValue(nextNode);  // New parent
+                        int g2 = Util.getCostValue(oldParent); // Old parent
                         
                         // El viejo sucesor tiene el camino más corto
-                        if (f1 < f2){
-                            // oldSuccessor.antecesor es nextNode (el padre)
-                            // Eliminar sucesor de cerrados
-                            // Añadir oldSuccessor a los sucesores de nextNode (el padre)
+                        if (g1 > g2){
+                            successorNode.setAntecesor(Util.clone(nextNode));
                         }
                         
+                    } else if (alreadyContains.equals("CLOSED")){
+                        // Do point 2
+                                                
+                        // Calcular por cual de ellos se llega al camino mínimo
+                        int g1 = Util.getCostValue(nextNode);  // New father
+                        int g2 = Util.getCostValue(oldParent); // Old father
                         
-                        /* THIS WORKS
-                        System.out.println("Remove node " + nextNode.getNodeID() + " from CLOSE"); //DEBUG
-                        boolean itsDeleted = closed.remove(nextNode); ////////////////////////// Check if returns -1 or not
-                        if (itsDeleted != false) System.out.println("SE ELIMINA"); //DEBUG
-                        else System.out.println("NO SE ELIMINA"); //DEBUG
-                        continue;
-                        */
-                    } 
+                        // El viejo sucesor tiene el camino más corto
+                        if (g1 > g2){
+                            // oldSuccessor.antecesor es nextNode (el padre)
+                            successorNode.setAntecesor(Util.clone(nextNode));
+                            
+                            // Eliminar nuevo padre de cerrados
+                            List<GraphNode<State>> childrenNewParent = graph.getChildren(nextNode);
+                        }
+                    }
                 }
                  
             }//End of for
