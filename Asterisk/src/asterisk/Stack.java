@@ -75,7 +75,7 @@ public class Stack implements Cloneable{
         return true;
     }
     
-    public Stack clone() throws CloneNotSupportedException 
+    public Stack clone()
     { 
         int i;
         List<Box> newStack = new ArrayList<Box>();

@@ -1,5 +1,7 @@
 package asterisk;
 
+import java.util.Arrays;
+
 public class StorageHouse implements Cloneable{
 
     public static int NUMBER_OF_STACKS = 5;
@@ -88,7 +90,7 @@ public class StorageHouse implements Cloneable{
         return new String(sb);
     }
     
-    public StorageHouse clone() throws CloneNotSupportedException 
+    public StorageHouse clone()
     { 
         int i;
         Stack[] newStacks = new Stack[NUMBER_OF_STACKS];

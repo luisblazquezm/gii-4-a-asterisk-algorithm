@@ -29,7 +29,7 @@ public class Box implements Cloneable{
                 );
     }
     
-    public Box clone() throws CloneNotSupportedException 
+    public Box clone() 
     { 
         return new Box(this.id, this.arrivalDate, this.departureDate); 
     } 
