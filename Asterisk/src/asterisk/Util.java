@@ -8,6 +8,7 @@ package asterisk;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,7 +18,51 @@ import java.util.logging.Logger;
  */
 public class Util {
     
-    public static void heuristicOrder(List<GraphNode> open)
+    public static void updateBestPathParent(Graph graph,
+                                            int stateId,
+                                            State newParent,
+                                            List<SearchNode> list,
+                                            boolean updateChildren)
+    {
+        SearchNode node = null;
+        for (SearchNode n : list)
+            if (n.getStateId() == stateId)
+                node = n;
+        if (node == null)  // Node not in list
+            return;
+        
+        State oldParentState = State.getState(node.getStateId());
+        int oldParentCost = Util.getStateCost(oldParentState);
+        int newParentCost = Util.getStateCost(newParent);
+        if (newParentCost < oldParentCost) {
+            node.setBestPathParent(newParent.getId());
+        }
+        
+        if (updateChildren) {
+            for (int childId : graph.getChildren(stateId)) {
+                updateBestPathParent(graph,
+                                     childId,
+                                     State.getState(stateId),
+                                     list,
+                                     false);
+            }
+        }
+            
+    }
+    
+    public static int getStateCost(State state) {
+        
+        int nodeCost = 0;
+        for (Stack stack : state.getStorageHouse().getStacks()) {
+            for (Box box : stack.getStack()) {
+                nodeCost += box.getDepartureDate();
+            }
+        }
+        
+        return -1 * nodeCost;
+    }
+    
+    public static void heuristicOrder(List<SearchNode> open)
     {
         // - (number of holes in stack + add(departureDate of inserted boxes))
         // Get the least (most negative)
@@ -25,22 +70,31 @@ public class Util {
         // g = add(departureDate of inserted boxes)
         // f = g + h (value)
         
-        int h = 0, g = 0, f = 0;
+        // h
+        int numberGaps = 0;
+                
+        // g
+        int nodeCost = 0;
+                
+        // f
+        int heuristicMerit = 0;
         
-        for (GraphNode<State> n : open){
-            for(Stack stack : n.getData().getStorageHouse().getStacks()){
-                h += StorageHouse.STACK_SIZE - stack.size();
+        for (SearchNode n : open){
+            State currentState = State.getState(n.getStateId());
+            for(Stack stack : currentState.getStorageHouse().getStacks()){
+                numberGaps += StorageHouse.STACK_SIZE - stack.size();
                 for (Box b : stack.getStack()){
-                    g += b.getDepartureDate();
+                    nodeCost += b.getDepartureDate();
                 }
             }
             //f = - (h + g);
-            f = - (h/5 + (g/30)*10); // Factor de 5 para priorizar las fechas de salida
-            n.setEvalFunction(f);
+            // Factor de 5 para priorizar las fechas de salida
+            heuristicMerit = -(numberGaps/5 + (nodeCost/30)*10);
+            n.setHeuristicMerit(heuristicMerit);
             
             // Very important to reset values
-            h = 0;
-            g = 0;
+            numberGaps = 0;
+            nodeCost = 0;
         }
         
         //Util.printStateOpen(open, "BEFORE"); //DEBUG
@@ -54,117 +108,67 @@ public class Util {
                node.getStorageHouse().fullStacks();
     }
     
-    public static List<State> expand(State currentNode) throws CloneNotSupportedException
+    public static List<State> expand(State currentState)
     {
-        return expand(currentNode, 1, true);
+        return expand(currentState, true);
     }
     
-    private static List<State> expand(State currentNode,
-                                         int recursivityLevel,
-                                         boolean checkLoops) throws CloneNotSupportedException
+    private static List<State> expand(State currentState,
+                                      boolean checkLoops)
     {
         List<State> successors = new ArrayList<>();
-        List<Box> newProductionList = null;
                 
-        for (int b = 0; b < currentNode.getProductionList().size(); b++){
+        for (int boxIndex = 0;
+             boxIndex < currentState.getProductionList().size();
+             boxIndex++){
             
-            // Copy the old production list into the new one we are going to test
-            try {
-                newProductionList = new ArrayList<>();
-                newProductionList.addAll(currentNode.getProductionList());
-                //Util.printProductionList(currentNode.getProductionList(), "NEW_PRODUCTION_LIST", recursivityLevel); //DEBUG
-            } catch (Exception ex) {
-                Logger.getLogger(Asterisk.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            
-            if (newProductionList.isEmpty()) return Collections.emptyList();
-            Box currentBox = newProductionList.remove(b);
+            List<Box> newProductionList = currentState.cloneProductionList();
+            Box currentBox = newProductionList.remove(boxIndex);
             
             // ITerate over stacks
-            for (int i = 0; i < currentNode.getStorageHouse().NUMBER_OF_STACKS; ++i){  
+            for (int stackIndex = 0;
+                 stackIndex < currentState.getStorageHouse().NUMBER_OF_STACKS;
+                 ++stackIndex){  
                 
                 // Clone state of storageHouse
-                StorageHouse newStorageHouse = (StorageHouse) currentNode.getStorageHouse().clone();
-                
+                StorageHouse newStorageHouse = currentState.cloneStorageHouse();
                 // Add new box in stack i
-                newStorageHouse.addBox(currentBox, i); 
+                newStorageHouse.addBox(currentBox, stackIndex);
 
-                /* DEBUG 
-                System.out.println("(NODE) STORAGEHOUSE INTENTO EN NIVEL " + recursivityLevel + " metiendo caja en la pila " + (i + 1));
-                Util.printStorageHouseState(newStorageHouse); //DEBUG
-                DEBUG */
-
-                State nextNode = new State(
-                                newProductionList,
-                                newStorageHouse
-                        );
+                State nextState = new State(newProductionList, newStorageHouse);
 
                 boolean shouldAdd = true;
 
                 if (checkLoops){
-                    List<State> nextNodeSuccessors = expand(nextNode, recursivityLevel+1, false);
-                    for (State n : nextNodeSuccessors){
-                        if (Util.compareNodes(n, currentNode)){
-                            //n.setValid(false);
-                            //System.out.println("->>>>>>>>>>>>>>>>>> FOUND LOOP. BREAKING ... ");
+                    List<State> grandChildren = expand(nextState, false);
+                    for (State grandChild : grandChildren){
+                        if (grandChild.getStorageHouse().equals(currentState.getStorageHouse())){
                             shouldAdd = false;
                             break;
 
                         }
                     }
-                    /*
-                    if(Util.allSuccessorsInvalid(nextNodeSuccessors))
-                        currentNode.setValid(false);
-                    */
                 }
-
-
-                // Check if nodes are not the same state
-                if (shouldAdd && !Util.compareNodes(nextNode, currentNode))
-                    successors.add(nextNode);
                 
-            } // For i
-        } // For b
-
-        /* DEBUG 
-        System.out.println("\nNumber of succesors in LEVEL " + recursivityLevel + ": " + successors.size());
-        System.out.println("\n\nLIST OF SUCCESORS"); 
-        System.out.println("--------------------------------------------------------"); 
-        for (State s: successors){
-            Util.printStorageHouseState(s.getStorageHouse()); //DEBUG
-            System.out.println();
-        }
-        System.out.println("--------------------------------------------------------"); 
-        System.out.println("\n\n"); 
-        DEBUG */
+                // Check if nodes are not the same state
+                if (shouldAdd && !(nextState.getStorageHouse().equals(currentState.cloneStorageHouse())))
+                    successors.add(nextState);
+                
+            } // For stackIndex
+        } // For boxIndex
 
         return successors;
     }
 
-    public static void printLists(List<GraphNode> list, String listName) {
-        int i = 1;
-        int j = 1;
-        
-        System.out.print(" CONTENT: [ ");
-        for(GraphNode<State> n : list){
-            System.out.print(n.getNodeID() + ", ");
+    public static void printList(List<SearchNode> list, String listName) {
+        System.out.print(listName + ": [ ");
+        for(SearchNode n : list){
+            System.out.print(n.getStateId() + ", ");
         }
         
-        System.out.print("] \n");
-        
-        for(GraphNode<State> n : list){
-            System.out.println("\n\nNODE " + n.getNodeID() + " from " + listName);
-            i++;
-            
-            // Print productionList
-            Util.printProductionList(n.getData().getProductionList(), "PRODUCTION_LIST", 0);
-            
-            // Print status of the storageHouse
-            if (listName.equals("OPEN"))
-                System.out.print(n.getData().getStorageHouse().toString());
-        }
+        System.out.print("]\n");
     }
-
+/*
     private static void printStateOpen(List<GraphNode> open, String state) {
         System.out.print(state + " HEURISTIC OPEN LIST CONTENT: [ ");
         for(GraphNode<State> n : open){
@@ -189,7 +193,7 @@ public class Util {
         }
         System.out.print("\n]\n\n");
     }
-
+*/
     public static boolean invalidStack(Stack stack, Box newBoxToAdd) {
         Box stackUpperBox = stack.getStack().get(0);
         
@@ -198,7 +202,7 @@ public class Util {
         else
             return true;
     }
-    
+  /*  
     public static boolean compareNodes(State h1, State h2) {
         return h1.getStorageHouse().equals(h2.getStorageHouse());
     }
@@ -237,6 +241,6 @@ public class Util {
         f = - (h + g);
         
         return f;
-    }
+    }*/
     
 }

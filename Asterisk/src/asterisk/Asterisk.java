@@ -3,18 +3,18 @@ package asterisk;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class Asterisk {
     
-    public static void main(String[] args) throws CloneNotSupportedException
+    public static void main(String[] args) throws CloneNotSupportedException, Exception
     {        
         /*
          * ====================================================================
          * STATE INFORMATION
          * ====================================================================
          */
+        
+        boolean DEBUG_ON = false;
         
         State initialState = new State(
             new ArrayList<>(
@@ -82,11 +82,11 @@ public class Asterisk {
          *              M' = M - (OPEN U CLOSED) (elements of M not contained
          *              in OPEN or CLOSED).
          *         3.6. Add M' to OPEN
-         *         3.7. For each 'm' in M' contained in OPEN or CLOSED
+         *         3.7. For each 'w' in M contained in OPEN or CLOSED
          *             3.7.1. If [CONDITION MUST BE SELECTED] change pointers
          *                    to 'n'.
-         *                 3.7.1.1. If 'm' contained in CLOSED, for each child
-         *                          of 'm' in GRAPH, change pointers if
+         *                 3.7.1.1. If 'w' contained in CLOSED, for each child
+         *                          of 'w' in GRAPH, change pointers if
          *                          [CONDITION MUST BE SELECTED]
          *         3.8. Reorder OPEN list according to heuristic function
          */
@@ -96,13 +96,15 @@ public class Asterisk {
         List<SearchNode> open = new ArrayList<>();
         
         /* Initialize open with the first node of G */
-        graph.addVertex(initialState);
+        State.addState(initialState);
+        graph.addVertex(initialState.getId());
         open.add(new SearchNode(initialState.getId()));
         
         // ====================================================================
         // MAIN LOOP
         // ====================================================================
-
+        System.out.println("Esto debería tardar como mucho 1 minuto (dependiendo de la máquina).");
+        System.out.println("Calculando...");
         boolean solutionFound = false;
         SearchNode goalNode = null;
         while(true){
@@ -117,8 +119,16 @@ public class Asterisk {
             // 3.2
             // Get next node from open list (nextNode = n)
             SearchNode currentNode = open.remove(0);
-            State currentState = graph.get(currentNode.getStateId());
+            State currentState = State.getState(currentNode.getStateId());
             closed.add(0, currentNode);
+            
+            if (DEBUG_ON) {
+                System.out.println("Current node: " + currentNode.getStateId());
+                currentState.printSelf();
+                System.out.println("After moving it from 'open' to 'closed'...");
+                Util.printList(open, "Open");
+                Util.printList(closed, "Closed");
+            }
             
             // 3.3
             // If next node is goal, SUCCESS
@@ -131,11 +141,24 @@ public class Asterisk {
             // 3.4
             // Expand node and add successors to graph (successors = M)
             List<State> children = Util.expand(currentState);
+            if (DEBUG_ON) {
+                System.out.print("EXPANDED CHILDREN: ");
+                if (children.isEmpty()) {
+                    System.out.println("empty.");
+                } else {
+                    System.out.println("");
+                }
+                for (State child : children) {
+                    System.out.println("Child: " + child.getId());
+                    child.printSelf();
+                }
+            }
             
             for (State child : children){
                 
                 // Add to graph G
-                graph.addVertex(child);
+                State.addState(child);
+                graph.addVertex(child.getId());
                 
                 // Create pointers from nextNode to every successor that was not
                 // in open or closed
@@ -154,43 +177,92 @@ public class Asterisk {
                 
                 for (SearchNode n : closed){
                     if (n.getStateId() == child.getId()){
-                        alreadyContains = "OPEN";
+                        if (alreadyContains.equals("OPEN")) {  // This case should not happen
+                            alreadyContains = "OPEN AND CLOSED";
+                            throw new Exception("Very bad this thing.");
+                        } else {
+                            alreadyContains = "CLOSED";
+                        }
                         break;
                     }
                 }
                 
                 // If it was not contained in open nor closed, create edges
                 // from nextNode to s in graph
+                
+                SearchNode childSearchNode = new SearchNode(child.getId());
                 if (alreadyContains.equals("NONE")) {
                     
-                } else if (alreadyContains.equals("OPEN")) {
+                    // Add parent
+                    childSearchNode.setBestPathParent(currentState.getId());
+                    // Add to open
+                    open.add(childSearchNode);
                     
-                } else if (alreadyContains.equals("CLOSED")){
+                } else {
                     
+                    /*if (alreadyContains.equals("OPEN")){
+                        Util.updateBestPathParent(graph,
+                                              childSearchNode.getStateId(),
+                                              currentState,
+                                              open,
+                                              false);
+                    } else if (alreadyContains.equals("CLOSED")){
+                        Util.updateBestPathParent(graph,
+                                              childSearchNode.getStateId(),
+                                              currentState,
+                                              open,
+                                              true);
+                    }*/
+                    
+                    // Cleaner than up above
+                    Util.updateBestPathParent(graph,
+                                              childSearchNode.getStateId(),
+                                              currentState,
+                                              open,
+                                              alreadyContains.equals("CLOSED"));
                 }
                  
             }//End of for
             
             // 3.8 Sort the Open list in order applying the heuristic evaluation function
-            try {
-                //System.out.println("Apply heuristic");
-                Util.heuristicOrder(open);  // Complains because of Exception
-            } catch (Exception ex) {
-                Logger.getLogger(Asterisk.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            Util.heuristicOrder(open);
             
         }// End of while
         
         if (solutionFound){
             
-            // Print states from goalState node to initialState node
-            graph.depthFirstPrintPath(goalNode);
+            System.out.println("¡Solución encontrada!");
             
-            System.out.println("SUCCESS");
+            System.out.println("La solución es (marcha atrás): ");
+            SearchNode currentNode = goalNode;
+            // Print states from goalState node to initialState node
+            while(true) {
+                System.out.println("Node " +
+                                                currentNode.getStateId() +
+                                                "'s best path parent: " +
+                                                currentNode.getBestPathParent());
+                State.getState(currentNode.getStateId()).printSelf();
+                for (SearchNode n : closed){
+                    if (n.getStateId() == currentNode.getBestPathParent()){
+                        currentNode = n;
+                        break;
+                    }
+                }
+                
+                if (currentNode.getBestPathParent() == 0) {
+                    System.out.println("Node " +
+                                                currentNode.getStateId() +
+                                                "'s best path parent: " +
+                                                currentNode.getBestPathParent());
+                    State.getState(currentNode.getStateId()).printSelf();
+                    break;
+                }
+            }
         } else {
             // Return FALIURE
             System.out.println("FAILURE");
         }
-
+        
+        System.out.println("Se puede ver la solución observando los estados de abajo a arriba.");
     }
 }

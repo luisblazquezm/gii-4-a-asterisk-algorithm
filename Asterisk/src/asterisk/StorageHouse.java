@@ -6,8 +6,28 @@ public class StorageHouse implements Cloneable{
 
     public static int NUMBER_OF_STACKS = 5;
     public static int STACK_SIZE = 4;
-
     private Stack[] stacks;
+    
+    public static void print(StorageHouse storageHouse) {
+        
+        System.out.println("\n");
+        
+        int j = 1;
+        int i = 1;
+        for (Stack s : storageHouse.getStacks()){
+            System.out.printf("\tStack " + j + " = [ ");
+            for (Box b : s.getStack()){
+                if (i != 4) System.out.printf("\t" + b.getDepartureDate() + ", ");
+                else System.out.printf(String.format("%d", b.getDepartureDate()));
+                i++;
+            }
+            i = 1;
+            System.out.printf("\t]\n");
+            j++;
+        }
+        
+        System.out.println("\n");
+    }
 
     public StorageHouse() {
         this.stacks = new Stack[NUMBER_OF_STACKS];
@@ -56,38 +76,14 @@ public class StorageHouse implements Cloneable{
 
     public boolean equals(StorageHouse storageHouse){
         for (int i = 0; i < this.stacks.length; i++){
-            if (this.stacks[i].size() != storageHouse.getStacks()[i].size()) return false;
+            if (this.stacks[i].size() != storageHouse.getStacks()[i].size()) {
+                return false;
+            }
             if (!this.stacks[i].equals(storageHouse.getStacks()[i])){
                 return false;
             }
         }
         return true;
-    }
-    
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("         Pila 1     Pila 2     Pila 3     Pila 4     Pila 5\n");
-        sb.append("        ________   ________   ________   ________   ________\n");
-        
-        
-        for (int i = 0; i < STACK_SIZE; ++i) {
-            
-            if (i == 3) sb.append("Top     ");
-            else if (i == 0) sb.append("Bottom  ");
-            else sb.append("        ");
-            
-            for (int j = 0; j < NUMBER_OF_STACKS; ++j) {
-                if (stacks[j].size() > i && stacks[j].peek(i) != null) {
-                    sb.append(String.format("|_ %2d _|   ", stacks[j].peek(i).getDepartureDate()));
-                } else {
-                    sb.append("|_    _|   ");
-                }
-            }
-            sb.append('\n');
-        }
-        sb.append("==========================================================\n");
-        return new String(sb);
     }
     
     public StorageHouse clone()

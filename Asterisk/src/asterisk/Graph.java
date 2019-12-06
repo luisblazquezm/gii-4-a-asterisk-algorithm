@@ -5,9 +5,9 @@
  */
 package asterisk;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -17,25 +17,26 @@ import java.util.TreeMap;
  */
 public class Graph {
 
-    private HashMap<Integer, State> vertices;
-    private SortedMap<Integer, List<Integer>> adjacencyList;
+    private SortedMap<Integer, HashSet<Integer>> adjacencyList;
 
-    public Graph(HashMap<Integer, State> vertices, SortedMap<Integer, List<Integer>> adjacencyList) {
-        this.vertices = vertices;
+    public Graph(SortedMap<Integer, HashSet<Integer>> adjacencyList) {
         this.adjacencyList = adjacencyList;
     }
-
+    
     public Graph() {
-        this.vertices = new HashMap<>();
         this.adjacencyList = new TreeMap<>();
     }
     
-    public State get(int vertexId) {
-        return vertices.get(vertexId);
+    public List<Integer> getChildren(int vertexId) {
+        List<Integer> children = new ArrayList<>();
+        for (int i : adjacencyList.keySet())
+            if (isChild(i, vertexId))
+                children.add(i);
+        return children;
     }
     
     public boolean hasVertex(int vertexId) {
-        return vertices.containsKey(vertexId);
+        return adjacencyList.containsKey(vertexId);
     }
     
     public boolean isParent(int parentId, int childId) {
@@ -57,21 +58,28 @@ public class Graph {
         return false;
     }
     
-    public void addVertex(State vertex) {
-        State newVertex = vertex;
-        if (!hasVertex(vertex.getId())) {
-            vertices.put(vertex.getId(), vertex);
-            adjacencyList.put(vertex.getId(), new ArrayList<>());
+    public void addVertex(int vertexId) {
+        if (!hasVertex(vertexId)) {
+            adjacencyList.put(vertexId, new HashSet<>());
         }
     }
     
-    private void addEdge(State child, State parent) {
-        if (!hasVertex(child.getId()))
-            addVertex(child);
-        if (!hasVertex(parent.getId()))
-            addVertex(parent);
-        if (!isParent(parent.getId(), child.getId())) {
-            adjacencyList.get(child.getId()).add(parent.getId());
+    public void printSelf() {
+        for (Integer vertexId : adjacencyList.keySet()) {
+            System.out.println(vertexId + " --- parents ---> ");
+            for (int i : adjacencyList.keySet()){
+                
+            }
+        }
+    }
+    
+    private void addEdge(int childId, int parentId) {
+        if (!hasVertex(childId))
+            addVertex(childId);
+        if (!hasVertex(parentId))
+            addVertex(parentId);
+        if (!isParent(parentId, childId)) {
+            adjacencyList.get(childId).add(parentId);
         }
     }
 

@@ -9,7 +9,7 @@ package asterisk;
  *
  * @author i0910465
  */
-public class SearchNode {
+public class SearchNode implements Comparable<SearchNode> {
     
     private int stateId;
     private int bestPathParent;
@@ -50,5 +50,9 @@ public class SearchNode {
     public void setHeuristicMerit(int heuristicMerit) {
         this.heuristicMerit = heuristicMerit;
     }
-    
+
+    @Override
+    public int compareTo(SearchNode node) {
+        return this.heuristicMerit - node.heuristicMerit;
+    }
 }
