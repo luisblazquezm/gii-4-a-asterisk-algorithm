@@ -1,5 +1,4 @@
 # a--algorithm
-Trabajo de la asignatura "Fundamentos de Sistemas Inteligentes" para la implementación de una solución mejorada aplicando el algoritmo de A* en Java al problema planteado en el trabajo del ordenamiento de cajas de un almacén en PROLOG
 
 ## Description
 Project based on the implementation of an improvement or a better solution to the problem given in PROLOG using A* algorithm using Java for the subject "Fundamentos de Sistemas Inteligentes" of the Computer Engineering Degree
