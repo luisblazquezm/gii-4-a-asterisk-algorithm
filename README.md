@@ -1,4 +1,4 @@
-# a--algorithm
+# a* algorithm
 
 ## Description
 Project based on the implementation of an improvement or a better solution to the problem given in PROLOG using A* algorithm using Java for the subject "Fundamentos de Sistemas Inteligentes" of the Computer Engineering Degree
